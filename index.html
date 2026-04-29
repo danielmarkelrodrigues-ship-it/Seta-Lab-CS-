@@ -32,9 +32,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .tbtn:hover{border-color:var(--bdm);color:var(--t1)}
 .tbtn.sel{border:1.5px solid var(--gr);background:var(--grl);color:var(--grd);font-weight:500}
 .tbtn.sel::after{content:'✓';position:absolute;top:5px;right:8px;font-size:10px;color:var(--gr)}
-.tipo-hint{font-size:11px;color:var(--t3);margin-top:5px}
+.tipo-hint{font-size:11px;color:var(--t3);margin-left:6px;font-weight:400;text-transform:none;letter-spacing:0}
 .section-block{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--r2);padding:1.25rem;margin-bottom:10px}
-.section-block .block-title{font-size:12px;font-weight:600;color:var(--gr);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;padding-bottom:8px;border-bottom:.5px solid var(--bd)}
+.block-title{font-size:12px;font-weight:600;color:var(--gr);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;padding-bottom:8px;border-bottom:.5px solid var(--bd)}
 .frow{margin-bottom:14px}.frow:last-child{margin-bottom:0}
 .frow label{display:block;font-size:12px;color:var(--t2);margin-bottom:6px}
 textarea,input[type=text],input[type=number]{width:100%;background:var(--bg2);border:.5px solid var(--bd);border-radius:var(--r1);padding:9px 12px;font-size:13px;color:var(--t1);font-family:inherit;outline:none;transition:border-color .15s}
@@ -44,17 +44,19 @@ textarea{resize:vertical;min-height:72px;line-height:1.6}
 .nrow label{display:block;font-size:12px;color:var(--t2);margin-bottom:5px}
 .gbtn{width:100%;padding:13px;font-size:14px;font-weight:600;background:var(--gr);border:none;border-radius:var(--r1);color:#fff;cursor:pointer;transition:background .15s}
 .gbtn:hover{background:#6d28d9}
-.gbtn:disabled{background:var(--bg2);color:var(--t3);cursor:not-allowed;border:.5px solid var(--bd)}
-.rcard{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--r2);padding:1.25rem;margin-top:14px}
-.rhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.rtitle{font-size:13px;font-weight:500;color:var(--t1)}
+.result-card{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--r2);padding:1.25rem;margin-top:14px}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.result-title{font-size:13px;font-weight:500;color:var(--t1)}
 .cpbtn{font-size:12px;padding:5px 14px;border-radius:var(--r1);background:transparent;border:.5px solid var(--bdm);color:var(--t2);cursor:pointer;transition:all .15s}
 .cpbtn:hover{background:var(--bg2)}
 .cpbtn.copied{color:var(--grd);border-color:var(--gr);background:var(--grl)}
-.msgprev{font-size:14px;color:var(--t1);line-height:1.75;white-space:pre-wrap;background:var(--bg2);border-radius:var(--r1);padding:14px 16px}
-.loading{text-align:center;padding:24px;color:var(--t3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px}
-.spin{width:16px;height:16px;border:2px solid var(--bd);border-top-color:var(--gr);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
+.prompt-box{font-size:13px;color:var(--t1);line-height:1.7;white-space:pre-wrap;background:var(--bg2);border-radius:var(--r1);padding:14px 16px;font-family:inherit}
+.instructions{background:var(--grl);border:.5px solid var(--bdm);border-radius:var(--r1);padding:12px 16px;margin-bottom:12px}
+.instructions p{font-size:13px;color:var(--grd);line-height:1.6;margin-bottom:6px}
+.instructions p:last-child{margin-bottom:0}
+.instructions strong{font-weight:600}
+.open-btn{display:inline-block;margin-top:8px;padding:7px 16px;font-size:13px;font-weight:500;background:var(--gr);color:#fff;border:none;border-radius:var(--r1);cursor:pointer;text-decoration:none;transition:background .15s}
+.open-btn:hover{background:#6d28d9}
 .plist{display:flex;flex-direction:column;gap:6px}
 .pitem{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg);border:.5px solid var(--bd);border-radius:var(--r1);font-size:13px}
 .piname{color:var(--t1);font-weight:500}
@@ -96,18 +98,15 @@ textarea{resize:vertical;min-height:72px;line-height:1.6}
   <div class="pane active" id="pane-nova">
     <div class="slabel">1. Selecione o cliente</div>
     <div class="cgrid" id="cgrid"></div>
-
     <div class="slabel">2. Áreas de melhoria <span class="tipo-hint">(selecione uma ou mais)</span></div>
     <div class="trow">
       <div class="tbtn" id="t-trafego">Tráfego pago</div>
       <div class="tbtn" id="t-social">Social media</div>
       <div class="tbtn" id="t-cardapio">Cardápio / operação</div>
     </div>
-
     <div class="slabel">3. Preencha o contexto</div>
     <div class="context-blocks" id="contextBlocks"></div>
-
-    <button class="gbtn" id="gbtn" style="margin-top:4px">Gerar mensagem com Claude</button>
+    <button class="gbtn" id="gbtn" style="margin-top:4px">Gerar prompt para o Claude</button>
     <div id="result"></div>
   </div>
 
@@ -139,21 +138,21 @@ var DEFAULT=['Divino Mineiro','Hebrom','Lanche dos Guri','Fogo no Disco','Pizzar
 var clients=JSON.parse(localStorage.getItem('sl_clients')||'null')||DEFAULT.slice();
 var selClient=null,selTipos=[],done={};
 
-var TIPO_CONFIG={
+var TIPOS={
   trafego:{label:'Tráfego pago',fields:[
     {id:'trafego_acao',label:'O que foi feito no tráfego?',type:'textarea',ph:'Ex: ajustamos o criativo principal, criamos nova campanha de conversão...'},
-    {id:'trafego_resultado',label:'Resultado gerado',type:'textarea',ph:'Ex: ROAS subiu de 3x para 4.1x, mais pedidos via delivery...'},
+    {id:'trafego_resultado',label:'Resultado gerado',type:'textarea',ph:'Ex: ROAS subiu, mais pedidos via delivery...'},
     {id:'trafego_inv',label:'Investido (R$)',type:'number',ph:'168'},
     {id:'trafego_ret',label:'Retorno em vendas (R$)',type:'number',ph:'688'},
     {id:'trafego_meta',label:'Meta de retorno (R$)',type:'number',ph:'1750'}
   ]},
   social:{label:'Social media',fields:[
-    {id:'social_acao',label:'O que foi feito no social?',type:'textarea',ph:'Ex: publicamos 3 reels de bastidores, criamos série de stories com enquete...'},
+    {id:'social_acao',label:'O que foi feito no social?',type:'textarea',ph:'Ex: publicamos 3 reels de bastidores, criamos série de stories...'},
     {id:'social_resultado',label:'Resultado gerado',type:'textarea',ph:'Ex: alcance aumentou 18%, 87 novos seguidores na semana...'}
   ]},
   cardapio:{label:'Cardápio / operação',fields:[
-    {id:'cardapio_acao',label:'O que foi feito no cardápio ou operação?',type:'textarea',ph:'Ex: criamos o monte seu combinho, ajustamos margem de 3 itens, reorganizamos a cozinha...'},
-    {id:'cardapio_resultado',label:'Resultado gerado',type:'textarea',ph:'Ex: ticket médio subiu R, menos desperdício, mais agilidade nos pedidos...'}
+    {id:'cardapio_acao',label:'O que foi feito no cardápio ou operação?',type:'textarea',ph:'Ex: criamos o monte seu combinho, ajustamos margem de 3 itens...'},
+    {id:'cardapio_resultado',label:'Resultado gerado',type:'textarea',ph:'Ex: ticket médio subiu R, menos desperdício...'}
   ]}
 };
 
@@ -165,7 +164,7 @@ document.getElementById('tab-clientes').addEventListener('click',function(){swit
 document.getElementById('t-trafego').addEventListener('click',function(){toggleTipo('trafego')});
 document.getElementById('t-social').addEventListener('click',function(){toggleTipo('social')});
 document.getElementById('t-cardapio').addEventListener('click',function(){toggleTipo('cardapio')});
-document.getElementById('gbtn').addEventListener('click',generate);
+document.getElementById('gbtn').addEventListener('click',gerarPrompt);
 document.getElementById('addClientBtn').addEventListener('click',addClient);
 document.getElementById('iNewClient').addEventListener('keydown',function(e){if(e.key==='Enter')addClient();});
 
@@ -192,7 +191,7 @@ function renderClients(){
 
 function toggleTipo(t){
   var idx=selTipos.indexOf(t);
-  if(idx>-1){selTipos.splice(idx,1);}else{selTipos.push(t);}
+  if(idx>-1)selTipos.splice(idx,1);else selTipos.push(t);
   document.getElementById('t-'+t).classList.toggle('sel',selTipos.indexOf(t)>-1);
   renderContextBlocks();
 }
@@ -203,37 +202,32 @@ function renderContextBlocks(){
   var active=order.filter(function(t){return selTipos.indexOf(t)>-1;});
   if(active.length===0){container.innerHTML='';return;}
   var existing={};
-  container.querySelectorAll('.section-block').forEach(function(el){existing[el.dataset.tipo]=el;});
+  container.querySelectorAll('.section-block[data-tipo]').forEach(function(el){existing[el.dataset.tipo]=el;});
   container.innerHTML='';
   active.forEach(function(t){
     if(existing[t]){container.appendChild(existing[t]);return;}
-    var cfg=TIPO_CONFIG[t];
+    var cfg=TIPOS[t];
     var block=document.createElement('div');
     block.className='section-block';block.dataset.tipo=t;
     var html='<div class="block-title">'+cfg.label+'</div>';
-    cfg.fields.forEach(function(f){
-      if(f.type==='textarea'){
-        html+='<div class="frow"><label>'+f.label+'</label><textarea id="'+f.id+'" placeholder="'+f.ph+'"></textarea></div>';
-      } else if(f.type==='number'){
-        html+='<div class="frow"><label>'+f.label+'</label><input type="number" id="'+f.id+'" placeholder="'+f.ph+'"></div>';
-      }
-    });
-    if(t==='trafego'){
-      var fields=cfg.fields.filter(function(f){return f.type==='number';});
-      html=html.replace(fields.map(function(f){return'<div class="frow"><label>'+f.label+'</label><input type="number" id="'+f.id+'" placeholder="'+f.ph+'"></div>';}).join(''),'<div class="frow"><label style="margin-bottom:8px">Dados de investimento (opcional)</label><div class="nrow">'+fields.map(function(f){return'<div><label>'+f.label+'</label><input type="number" id="'+f.id+'" placeholder="'+f.ph+'"></div>';}).join('')+'</div></div>');
+    var numFields=cfg.fields.filter(function(f){return f.type==='number';});
+    var textFields=cfg.fields.filter(function(f){return f.type==='textarea';});
+    textFields.forEach(function(f){html+='<div class="frow"><label>'+f.label+'</label><textarea id="'+f.id+'" placeholder="'+f.ph+'"></textarea></div>';});
+    if(numFields.length>0){
+      html+='<div class="frow"><label>Dados de investimento (opcional)</label><div class="nrow">';
+      numFields.forEach(function(f){html+='<div><label>'+f.label+'</label><input type="number" id="'+f.id+'" placeholder="'+f.ph+'"></div>';});
+      html+='</div></div>';
     }
     block.innerHTML=html;
     container.appendChild(block);
   });
-  var prox=document.getElementById('iProximo');
-  if(!prox){
-    var prow=document.createElement('div');
-    prow.className='section-block';prow.id='proximo-block';
-    prow.innerHTML='<div class="frow" style="margin:0"><label>Próximo passo</label><input type="text" id="iProximo" placeholder="Ex: vamos testar novo criativo focado no combo duplo"></div>';
-    container.appendChild(prow);
-  } else {
-    container.appendChild(document.getElementById('proximo-block'));
+  var proxBlock=document.getElementById('proximo-block');
+  if(!proxBlock){
+    proxBlock=document.createElement('div');
+    proxBlock.className='section-block';proxBlock.id='proximo-block';
+    proxBlock.innerHTML='<div class="frow" style="margin:0"><label>Próximo passo (opcional)</label><input type="text" id="iProximo" placeholder="Ex: vamos testar novo criativo focado no combo duplo"></div>';
   }
+  container.appendChild(proxBlock);
 }
 
 function getVal(id){var el=document.getElementById(id);return el?el.value.trim():'';}
@@ -287,61 +281,55 @@ function showAlert(msg){
   setTimeout(function(){el.remove();},3000);
 }
 
-async function generate(){
+function gerarPrompt(){
   if(!selClient){showAlert('Selecione um cliente primeiro.');return;}
   if(selTipos.length===0){showAlert('Selecione ao menos uma área de melhoria.');return;}
 
-  var sections=[];
   var order=['trafego','social','cardapio'];
   var labels={trafego:'Tráfego pago',social:'Social media',cardapio:'Cardápio / operação'};
+  var areas=selTipos.map(function(t){return labels[t];}).join(', ');
+  var partes='';
 
-  var hasContent=true;
   order.filter(function(t){return selTipos.indexOf(t)>-1;}).forEach(function(t){
-    var cfg=TIPO_CONFIG[t];
-    var textFields=cfg.fields.filter(function(f){return f.type==='textarea';});
-    textFields.forEach(function(f){if(!getVal(f.id))hasContent=false;});
-  });
-  if(!hasContent){showAlert('Preencha todos os campos de ação e resultado.');return;}
-
-  var promptParts='';
-  order.filter(function(t){return selTipos.indexOf(t)>-1;}).forEach(function(t){
-    var cfg=TIPO_CONFIG[t];
-    promptParts+='\n\n## '+labels[t]+'\n';
-    cfg.fields.forEach(function(f){
-      var v=getVal(f.id);
-      if(v) promptParts+='- '+f.label+': '+v+'\n';
+    var cfg=TIPOS[t];
+    partes+='\n\n## '+labels[t]+'\n';
+    cfg.fields.filter(function(f){return f.type==='textarea';}).forEach(function(f){
+      var v=getVal(f.id);if(v)partes+='- '+f.label+': '+v+'\n';
     });
     if(t==='trafego'){
       var inv=getVal('trafego_inv'),ret=getVal('trafego_ret'),meta=getVal('trafego_meta');
-      if(inv&&ret) promptParts+='- Dados financeiros: investimos R$'+Number(inv).toLocaleString('pt-BR')+' e retorno foi R$'+Number(ret).toLocaleString('pt-BR')+(meta?', meta: R$'+Number(meta).toLocaleString('pt-BR'):'')+'\n';
+      if(inv&&ret)partes+='- Investido: R$'+inv+' | Retorno: R$'+ret+(meta?' | Meta: R$'+meta:'')+'\n';
     }
   });
 
   var prox=getVal('iProximo');
-  var areas=selTipos.map(function(t){return labels[t];}).join(', ');
+  var prompt='Você é o assistente de comunicação da Seta Lab - Administradora de Restaurantes. Redija uma mensagem de WhatsApp para o cliente "'+selClient+'" sobre melhorias recentes nas áreas de: '+areas+'.\n\nDiretrizes:\n- Tom caloroso, direto e próximo — como um parceiro de negócio\n- Linguagem simples, sem jargão técnico\n- Integre as áreas numa narrativa coesa, sem separar por tópico\n- Máximo 5 parágrafos curtos\n- No máximo 2 emojis\n- Comece direto com a principal novidade\n'+partes+(prox?'\n- Próximo passo: '+prox+'\n':'')+'\nEscreva apenas a mensagem final, sem introdução nem aspas.';
 
-  var prompt='Você é o assistente de comunicação da Seta Lab - Administradora de Restaurantes. Redija uma mensagem de WhatsApp para o cliente "'+selClient+'" sobre melhorias recentes nas áreas de: '+areas+'.\n\nDiretrizes:\n- Tom caloroso, direto e próximo — como um parceiro de negócio\n- Linguagem simples, sem jargão técnico\n- Integre as áreas numa narrativa coesa, não lista separada por tópico\n- Máximo 5 parágrafos curtos\n- No máximo 2 emojis\n- Comece direto com a principal novidade\n'+promptParts+(prox?'\n- Próximo passo: '+prox+'\n':'')+'\nEscreva apenas a mensagem final, sem introdução nem aspas.';
+  done[selClient]=true;
 
-  var btn=document.getElementById('gbtn');
-  btn.disabled=true;btn.textContent='Gerando mensagem...';
-  document.getElementById('result').innerHTML='<div class="rcard"><div class="loading"><div class="spin"></div>Claude está escrevendo para '+selClient+'...</div></div>';
+  document.getElementById('result').innerHTML=
+    '<div class="result-card">'+
+      '<div class="instructions">'+
+        '<p><strong>Prompt gerado!</strong> Siga os passos abaixo:</p>'+
+        '<p>1. Clique em "Copiar prompt"<br>2. Abra o Claude.ai numa nova aba<br>3. Cole o prompt e envie<br>4. Copie a mensagem gerada e envie ao cliente</p>'+
+        '<a class="open-btn" href="https://claude.ai" target="_blank">Abrir Claude.ai</a>'+
+      '</div>'+
+      '<div class="result-header">'+
+        '<div class="result-title">Prompt para '+selClient+'</div>'+
+        '<button class="cpbtn" id="cpbtn">Copiar prompt</button>'+
+      '</div>'+
+      '<div class="prompt-box" id="promptText">'+prompt.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'+
+    '</div>';
 
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();
-    var msg=(data.content||[]).map(function(b){return b.text||'';}).join('').trim()||'Erro ao gerar mensagem.';
-    done[selClient]=true;
-    document.getElementById('result').innerHTML='<div class="rcard"><div class="rhead"><div class="rtitle">Mensagem para '+selClient+'</div><button class="cpbtn" id="cpbtn">Copiar</button></div><div class="msgprev" id="msgtext">'+msg+'</div></div>';
-    document.getElementById('cpbtn').addEventListener('click',function(){
-      navigator.clipboard.writeText(document.getElementById('msgtext').innerText).then(function(){
-        var b=document.getElementById('cpbtn');b.textContent='Copiado!';b.classList.add('copied');
-        setTimeout(function(){b.textContent='Copiar';b.classList.remove('copied');},2500);
-      });
+  document.getElementById('cpbtn').addEventListener('click',function(){
+    navigator.clipboard.writeText(prompt).then(function(){
+      var b=document.getElementById('cpbtn');
+      b.textContent='Copiado!';b.classList.add('copied');
+      setTimeout(function(){b.textContent='Copiar prompt';b.classList.remove('copied');},2500);
     });
-  }catch(e){
-    document.getElementById('result').innerHTML='<div class="rcard"><div class="loading">Erro ao conectar. Verifique sua conexão e tente novamente.</div></div>';
-  }
-  btn.disabled=false;btn.textContent='Gerar mensagem com Claude';
+  });
+
+  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 var today=new Date();
